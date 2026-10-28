@@ -17,19 +17,25 @@ def search_hackernews(query: str, limit: int):
 
     data = response.json()
     hits = data["hits"]
-        
-    first_hit = hits[0]
 
-
-    result = ResearchResult(
-      title=first_hit["title"],
-      authors=[first_hit["author"]],
-      url=first_hit["url"],
+    results = []
+    for hit in hits:
+     result = ResearchResult(
+      title=hit["title"],
+      authors=[hit["author"]],
+      url=hit["url"],
       source="Hacker News",
-      published_at=first_hit["created_at"],
-      points=first_hit.get("points"),
+      published_at=hit["created_at"],
+      points=hit.get("points"),
     )
-    return result
+     results.append(result)
+    
+
+    print(type(results))
+    print(len(results))
+    print(type(results[0]))
+    return results
+  
    # print(first_hit.keys())
    # print(first_hit["title"])
    # print(first_hit["author"])
@@ -40,4 +46,4 @@ def search_hackernews(query: str, limit: int):
    # print(data.keys())
 
 
-print(search_hackernews("cybersecurity", 2))
+search_hackernews("cybersecurity", 2)
