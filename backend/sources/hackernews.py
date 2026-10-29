@@ -3,13 +3,35 @@ from backend.models import ResearchResult
 
 HN_SEARCH_URL = "https://hn.algolia.com/api/v1/search"
 
+# normalize the hits into a list of ResearchResult objects
+def normalize_hits(hits):
+  
+ results = []
+    
+ for hit in hits:
+     if hit.get("url") is None:
+        continue
+     
+     result = ResearchResult(
+      title=hit.get("title") or "No title",
+      authors=[hit.get("author") or "Unknown"],
+      url=hit["url"],
+      source="Hacker News",
+      published_at=hit.get("created_at"),
+      points=hit.get("points"),
+    )
+     results.append(result)
+    
+ return results
 
+
+# get raw data
 def search_hackernews(query: str, limit: int):
     search_parameters = {
         "query": query,
         "hitsPerPage": limit
     }
-
+# talk to hacker news api and get results
     response = httpx.get(
         HN_SEARCH_URL, 
         params=search_parameters
@@ -17,33 +39,11 @@ def search_hackernews(query: str, limit: int):
 
     data = response.json()
     hits = data["hits"]
-
-    results = []
-    for hit in hits:
-     result = ResearchResult(
-      title=hit["title"],
-      authors=[hit["author"]],
-      url=hit["url"],
-      source="Hacker News",
-      published_at=hit["created_at"],
-      points=hit.get("points"),
-    )
-     results.append(result)
     
-
-    print(type(results))
-    print(len(results))
-    print(type(results[0]))
+    results = normalize_hits(hits)
     return results
-  
-   # print(first_hit.keys())
-   # print(first_hit["title"])
-   # print(first_hit["author"])
-   #  print(first_hit["url"])
-   #  print(first_hit["points"])
-   # print(first_hit["created_at"])
-
-   # print(data.keys())
 
 
-search_hackernews("cybersecurity", 2)
+
+
+

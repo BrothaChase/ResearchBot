@@ -11,7 +11,7 @@ class ResearchResult(BaseModel):
     authors: list[str]
     url: str
     source: str
-    published_at: datetime
+    published_at: datetime | None = None
     points: int | None = None
     score: int = 0
     
