@@ -7,7 +7,8 @@ HN_SEARCH_URL = "https://hn.algolia.com/api/v1/search"
 def normalize_hits(hits):
   
  results = []
-    
+
+    # Skip results without an external article URL.
  for hit in hits:
      if hit.get("url") is None:
         continue
@@ -21,7 +22,7 @@ def normalize_hits(hits):
       points=hit.get("points"),
     )
      results.append(result)
-    
+ 
  return results
 
 
@@ -31,12 +32,21 @@ def search_hackernews(query: str, limit: int):
         "query": query,
         "hitsPerPage": limit
     }
-# talk to hacker news api and get results
-    response = httpx.get(
+    
+    try:      
+      # talk to hacker news api and get results
+     response = httpx.get(
         HN_SEARCH_URL, 
         params=search_parameters
      )
 
+     response.raise_for_status() # detects if the request failed and raises an exception
+   
+    except httpx.HTTPError: 
+      print("Hacker News request failed ")
+      return [] # return empty list on failure & immediately exit the function
+
+    
     data = response.json()
     hits = data["hits"]
     
@@ -44,6 +54,6 @@ def search_hackernews(query: str, limit: int):
     return results
 
 
-
-
-
+# temporary test code to verify the function works
+# results = search_hackernews("machine learning", 2);
+# print(results);
