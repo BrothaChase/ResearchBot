@@ -37,14 +37,20 @@ def search_hackernews(query: str, limit: int):
       # talk to hacker news api and get results
      response = httpx.get(
         HN_SEARCH_URL, 
-        params=search_parameters
+        params=search_parameters,
+        timeout=5.0
      )
 
      response.raise_for_status() # detects if the request failed and raises an exception
-   
-    except httpx.HTTPError: 
-      print("Hacker News request failed ")
-      return [] # return empty list on failure & immediately exit the function
+
+   # store caught exception in variable error
+    except httpx.TimeoutException:
+       print("Hacker News request timed out")
+       return []
+
+    except httpx.HTTPError as error:
+       print(f"Hacker News request failed: {error}")
+       return [] # return empty list on failure & immediately exit the function
 
     
     data = response.json()
@@ -55,5 +61,5 @@ def search_hackernews(query: str, limit: int):
 
 
 # temporary test code to verify the function works
-# results = search_hackernews("machine learning", 2);
-# print(results);
+results = search_hackernews("machine learning", 2);
+print(results);
