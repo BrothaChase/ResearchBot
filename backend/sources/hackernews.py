@@ -1,7 +1,9 @@
 import httpx
+import logging
 from backend.models import ResearchResult
 
 HN_SEARCH_URL = "https://hn.algolia.com/api/v1/search"
+logger = logging.getLogger(__name__) # recieve or create a logger 
 
 # normalize the hits into a list of ResearchResult objects
 def normalize_hits(hits):
@@ -45,11 +47,11 @@ def search_hackernews(query: str, limit: int):
 
    # store caught exception in variable error
     except httpx.TimeoutException:
-       print("Hacker News request timed out")
+       logger.warning("Hacker News request timed out")
        return []
 
     except httpx.HTTPError as error:
-       print(f"Hacker News request failed: {error}")
+       logger.error("Hacker News request failed: %s", error)
        return [] # return empty list on failure & immediately exit the function
 
     

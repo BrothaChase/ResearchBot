@@ -1,5 +1,12 @@
+import logging
 from fastapi import FastAPI
 from backend.models import SearchRequest
+from backend.sources.hackernews import search_hackernews
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+)
 
 app = FastAPI()
 
@@ -14,4 +21,11 @@ def about():
 
 @app.post("/search")
 def search(request:SearchRequest):
- return {"query":request.query, "limit": request.limit}
+ results = search_hackernews(request.query, request.limit)
+ return {
+  "query":request.query, 
+  "limit": request.limit, 
+  "results": results
+ 
+  }
+ 
