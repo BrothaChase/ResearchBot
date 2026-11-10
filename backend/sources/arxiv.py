@@ -32,11 +32,22 @@ def search_arxiv(query: str, limit: int):
     root = ET.fromstring(response.text) # parse the XML response
     entries = root.findall("atom:entry", namespaces) # find all entries in the XML response
 
-    # Extract the first entry and its title, authors, URL, and published date
-    if entries:
-     first_entry = entries[0]
+    for entry in entries:
+      
+     # URL extraction
+     id_element = entry.find("atom:id", namespaces)
+     paper_url = None
+    
+     if id_element is not None and id_element.text:
+        paper_url = id_element.text.strip()
 
-     title_element = first_entry.find("atom:title", namespaces)
+     if not paper_url:
+         continue
+            
+     print("Paper URL:", paper_url)
+
+     # title extraction
+     title_element = entry.find("atom:title", namespaces)
      title = "No title"
      
      if title_element is not None and title_element.text:
@@ -48,7 +59,7 @@ def search_arxiv(query: str, limit: int):
      print("Paper title:", title)
      
     # Author(s) extraction
-     author_elements = first_entry.findall("atom:author", namespaces)
+     author_elements = entry.findall("atom:author", namespaces)
      authors = []
 
      for author in author_elements:
@@ -66,15 +77,8 @@ def search_arxiv(query: str, limit: int):
 
      print("Authors:", authors)
 
-     # Paper url
-     id_element = first_entry.find("atom:id", namespaces)
-    
-     if id_element is not None and id_element.text:
-        paper_url = id_element.text.strip()
-        print("Paper URL:", paper_url)
-
      # published date
-     published_element = first_entry.find("atom:published", namespaces)
+     published_element = entry.find("atom:published", namespaces)
      published_date = None
 
      if published_element is not None and published_element.text:
@@ -86,6 +90,41 @@ def search_arxiv(query: str, limit: int):
      else:
            print("No Date")
         
-search_arxiv("machine learning", 1)
+# search_arxiv("machine learning", 1)
 
 
+test_xml = """
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <entry>
+        <id>https://arxiv.org/abs/1234.56789</id>
+    </entry>
+    <entry>
+        <id>   </id>
+    </entry>
+     <entry>
+       
+  </entry>
+    <entry>
+        <id>https://arxiv.org/abs/9876.54321</id>
+    </entry>
+
+</feed>
+"""
+
+test_entry = ET.fromstring(test_xml) 
+
+test_namespaces = {
+    "atom": "http://www.w3.org/2005/Atom"
+}
+
+for entry in test_entry.findall("atom:entry", test_namespaces):
+    paper_url = None
+    id_element = entry.find("atom:id", test_namespaces)
+    
+    if id_element is not None and id_element.text:
+        paper_url = id_element.text.strip()
+
+    if not paper_url:
+         continue
+        
+    print("Test Paper URL:", paper_url)
