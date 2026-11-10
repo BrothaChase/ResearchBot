@@ -27,6 +27,7 @@ def search_arxiv(query: str, limit: int):
     namespaces = {
         "atom": "http://www.w3.org/2005/Atom",
     }
+    
      # Parse the XML response and extract the paper title
     root = ET.fromstring(response.text) # parse the XML response
     entries = root.findall("atom:entry", namespaces) # find all entries in the XML response
@@ -84,6 +85,7 @@ def search_arxiv(query: str, limit: int):
            print("Published On:", published_date)
      else:
            print("No Date")
-
-
+        
 search_arxiv("machine learning", 1)
+
+
