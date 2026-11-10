@@ -36,9 +36,15 @@ def search_arxiv(query: str, limit: int):
      first_entry = entries[0]
 
      title_element = first_entry.find("atom:title", namespaces)
+     title = "No title"
+     
+     if title_element is not None and title_element.text:
+        cleaned_title = title_element.text.strip() 
 
-     if title_element is not None:
-        print("Paper title:", title_element.text)
+        if cleaned_title:
+          title = cleaned_title 
+        
+     print("Paper title:", title)
      
     # Author(s) extraction
      author_elements = first_entry.findall("atom:author", namespaces)
@@ -78,5 +84,6 @@ def search_arxiv(query: str, limit: int):
            print("Published On:", published_date)
      else:
            print("No Date")
+
 
 search_arxiv("machine learning", 1)
